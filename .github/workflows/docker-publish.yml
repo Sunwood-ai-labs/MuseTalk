@@ -34,21 +34,43 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (cu12)
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: Dockerfile.cu12
           push: true
           tags: |
-            ghcr.io/${{ env.REPO }}:latest
-            ghcr.io/${{ env.REPO }}:${{ env.TIMESTAMP }}
-            ghcr.io/${{ env.REPO }}:${{ env.DATE_TAG }}
-            ghcr.io/${{ env.REPO }}:${{ github.sha }}
+            ghcr.io/${{ env.REPO }}:cu12
+            ghcr.io/${{ env.REPO }}:cu12-latest
+            ghcr.io/${{ env.REPO }}:cu12-${{ env.TIMESTAMP }}
+            ghcr.io/${{ env.REPO }}:cu12-${{ env.DATE_TAG }}
+            ghcr.io/${{ env.REPO }}:cu12-${{ github.sha }}
+
+      - name: Build and push Docker image (cu12-with-weights)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.cu12.with-weights
+          push: true
+          tags: |
+            ghcr.io/${{ env.REPO }}:cu12-with-weights
+            ghcr.io/${{ env.REPO }}:cu12-with-weights-latest
+            ghcr.io/${{ env.REPO }}:cu12-with-weights-${{ env.TIMESTAMP }}
+            ghcr.io/${{ env.REPO }}:cu12-with-weights-${{ env.DATE_TAG }}
+            ghcr.io/${{ env.REPO }}:cu12-with-weights-${{ github.sha }}
 
       - name: Output image tags
         run: |
-          echo "🐳 Published Docker images:"
-          echo "  - ghcr.io/${{ env.REPO }}:latest"
-          echo "  - ghcr.io/${{ env.REPO }}:${{ env.TIMESTAMP }}"
-          echo "  - ghcr.io/${{ env.REPO }}:${{ env.DATE_TAG }}"
-          echo "  - ghcr.io/${{ env.REPO }}:${{ github.sha }}"
+          echo "🐳 Published Docker images (cu12):"
+          echo "  - ghcr.io/${{ env.REPO }}:cu12"
+          echo "  - ghcr.io/${{ env.REPO }}:cu12-latest"
+          echo "  - ghcr.io/${{ env.REPO }}:cu12-${{ env.TIMESTAMP }}"
+          echo "  - ghcr.io/${{ env.REPO }}:cu12-${{ env.DATE_TAG }}"
+          echo "  - ghcr.io/${{ env.REPO }}:cu12-${{ github.sha }}"
+          echo "🐳 Published Docker images (cu12-with-weights):"
+          echo "  - ghcr.io/${{ env.REPO }}:cu12-with-weights"
+          echo "  - ghcr.io/${{ env.REPO }}:cu12-with-weights-latest"
+          echo "  - ghcr.io/${{ env.REPO }}:cu12-with-weights-${{ env.TIMESTAMP }}"
+          echo "  - ghcr.io/${{ env.REPO }}:cu12-with-weights-${{ env.DATE_TAG }}"
+          echo "  - ghcr.io/${{ env.REPO }}:cu12-with-weights-${{ github.sha }}"

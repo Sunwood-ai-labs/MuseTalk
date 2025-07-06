@@ -42,8 +42,12 @@ RUN uv pip install pip
 # MMLab パッケージをopenmimでインストール（MuseTalkの推奨方法）
 RUN uv pip install --no-cache-dir -U openmim
 RUN mim install mmengine
-# RUN mim install "mmcv==2.0.1"
-# RUN mim install "mmdet==3.1.0"  
+
+RUN uv pip install torch==2.0.0+cu117 torchvision==0.15.1+cu117 torchaudio==2.0.1+cu117 --index-url https://download.pytorch.org/whl/cu117
+
+RUN uv pip install numpy==1.23.5
+RUN mim install "mmcv==2.0.1"
+RUN mim install "mmdet==3.1.0"  
 RUN mim install "mmpose==1.1.0"
 
 # アプリケーションコードをコピー
@@ -53,4 +57,4 @@ COPY . .
 EXPOSE 7860
 
 # 仮想環境のPythonを使用してアプリケーションを実行
-CMD ["python", "app.py", "--server_name", "0.0.0.0", "--server_port", "7860"]
+CMD ["python", "app.py", "--ip", "0.0.0.0"]

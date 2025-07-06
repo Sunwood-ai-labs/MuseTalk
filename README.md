@@ -44,6 +44,39 @@ Learn more details [here](https://arxiv.org/abs/2410.10122).
 - [04/02/2024] Release MuseTalk project and pretrained models.
 
 
+## 🐳 Docker/Composeによる起動方法
+
+MuseTalkはDockerおよびdocker-composeを用いて、GPU環境で簡単に起動できます。
+
+### 必要条件
+- NVIDIA GPUおよびNVIDIA Container Toolkit
+- Docker, docker-compose
+
+### 使い方
+
+1. イメージをビルドしてCLI推論サービスを起動
+   ```sh
+   docker compose up musetalk
+   ```
+
+2. Gradio WebUIサービスを起動（Webブラウザで http://localhost:7865 へアクセス）
+   ```sh
+   docker compose up musetalk-webui
+   ```
+
+3. 本番用プリビルドイメージで起動（事前にモデル等を配置）
+   ```sh
+   docker compose --profile production up musetalk-production
+   ```
+
+### 主要ボリューム・ポート
+- ./pretrained_models:/app/pretrained_models
+- ./.cache/huggingface:/root/.cache/huggingface
+- ./output_long:/app/output_long
+- ./hq_results:/app/hq_results
+- ポート: 7860 (WebUIは7865:7860でマッピング)
+
+詳細は [`docker-compose.yml`](docker-compose.yml:1) を参照してください。
 ## Model
 ![Model Structure](https://github.com/user-attachments/assets/02f4a214-1bdd-4326-983c-e70b478accba)
 MuseTalk was trained in latent spaces, where the images were encoded by a freezed VAE. The audio was encoded by a freezed `whisper-tiny` model. The architecture of the generation network was borrowed from the UNet of the `stable-diffusion-v1-4`, where the audio embeddings were fused to the image embeddings by cross-attention. 

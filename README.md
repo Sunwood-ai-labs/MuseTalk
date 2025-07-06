@@ -48,6 +48,36 @@ Learn more details [here](https://arxiv.org/abs/2410.10122).
 
 MuseTalkはDockerおよびdocker-composeを用いて、GPU環境で簡単に起動できます。
 
+---
+
+### 🐳✨ モデル重み同梱版Docker Composeの利用方法
+
+本リポジトリには、`download_weights.sh` をビルド時に自動実行し、モデル重みをイメージに同梱したDocker Composeファイル一式（`docker-compose.with-weights.yml` および `Dockerfile.cu12.with-weights`）が含まれています。
+
+#### ✅ 特徴
+- **初回起動時に重みのダウンロード不要**（ネットワークが制限された環境でも利用可能）
+- **`models/` ディレクトリがイメージ内に含まれる**ため、すぐに推論を開始できます
+
+#### 🚀 使い方
+
+1. イメージのビルド  
+   ```
+   docker compose -f docker-compose.with-weights.yml build
+   ```
+
+2. サービスの起動  
+   ```
+   docker compose -f docker-compose.with-weights.yml up musetalk-webui
+   ```
+
+3. ブラウザで `http://localhost:7865` にアクセス
+
+#### 📝 注意事項
+- モデル重みのバージョンを更新したい場合は、`download_weights.sh` を修正し、再度ビルドしてください。
+- ディスク容量にご注意ください（重みファイルがイメージに含まれます）。
+- 通常版（`docker-compose.yml`）との併用も可能です。
+
+---
 ### 必要条件
 - NVIDIA GPUおよびNVIDIA Container Toolkit
 - Docker, docker-compose

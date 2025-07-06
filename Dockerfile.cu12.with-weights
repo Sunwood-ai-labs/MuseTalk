@@ -1,0 +1,68 @@
+FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
+
+WORKDIR /app
+
+# 非対話的インストール用の環境変数を設定
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Tokyo
+
+# システム依存関係
+RUN apt-get update && apt-get install -y \
+    git \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    build-essential \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    curl \
+    ca-certificates \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+# UVをインストールしてPATHを更新
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
+
+# 仮想環境を作成
+RUN uv venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# 依存関係ファイルを先にコピー（Docker キャッシュ最適化）
+COPY requirements_cu12.txt .
+COPY requirements_gradio_mini.txt .
+
+# UVで仮想環境にパッケージをインストール
+RUN uv pip install -r requirements_cu12.txt
+RUN uv pip install -r requirements_gradio_mini.txt
+
+# pipを仮想環境にインストール（ビルド時に必要）
+RUN uv pip install pip
+
+# MMLab パッケージをopenmimでインストール（MuseTalkの推奨方法）
+RUN uv pip install --no-cache-dir -U openmim
+RUN mim install mmengine
+
+RUN uv pip install torch==2.0.0+cu117 torchvision==0.15.1+cu117 torchaudio==2.0.1+cu117 --index-url https://download.pytorch.org/whl/cu117
+
+RUN uv pip install numpy==1.23.5
+RUN mim install "mmcv==2.0.1"
+RUN mim install "mmdet==3.1.0"  
+RUN mim install "mmpose==1.1.0"
+
+# download_weights.sh用の依存パッケージをインストール
+RUN uv pip install "huggingface_hub[cli]" gdown
+
+WORKDIR /app
+# スクリプトを先にコピー（明示的に）
+COPY download_weights.sh ./
+# スクリプトをコピー
+COPY . .
+
+# モデル重みをダウンロード
+# モデル重みをダウンロード（改行コードを修正してから実行）
+RUN sed -i 's/\r$//' download_weights.sh && chmod +x download_weights.sh && bash download_weights.sh
+
+
+# 残りのアプリケーションファイルをコピー
+# COPY . .

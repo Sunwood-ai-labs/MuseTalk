@@ -1,0 +1,43 @@
+# ==========================================================
+# 🐳 MuseTalk docker-compose（モデル重み同梱版）
+# - NVIDIA GPU環境必須
+# - サービス: 推論CLI, Gradio WebUI, 本番用イメージ
+# - download_weights.sh をビルド時に実行し、モデル重みをイメージに同梱
+# - 詳細・使い方はREADME.md参照
+# ==========================================================
+
+version: "3.9"
+
+services:
+
+  # 🌐 MuseTalk Gradio WebUIサービス（モデル重み同梱）
+  musetalk-webui:
+    build:
+      context: .
+      dockerfile: Dockerfile.cu12.with-weights
+    # volumes:
+    #   - .:/app
+    #   - ./.cache/huggingface:/root/.cache/huggingface
+      # - ./output_long:/app/output_long
+      # - ./hq_results:/app/hq_results
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+      - TZ=Asia/Tokyo
+    ports:
+      - "7865:7860"
+    command: bash -c "python app.py --ip 0.0.0.0"
+    # command: ["bash"]
+    tty: true
+    stdin_open: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+# ----------------------------------------------------------
+# 使い方例:
+#   docker compose -f docker-compose.with-weights.yml up musetalk-webui
+# ----------------------------------------------------------
